@@ -40,7 +40,17 @@
 
 **处理方式：** 解析阶段直接跳过 `---`，不在 blocks 中生成 divider。
 
-## 4. 分类器子串匹配陷阱
+## 4. 写入批次上限（45 blocks 会 1770001）
+
+大文档写入时需分批，每批最多 **20 个 blocks**（45+ 返回 `1770001 invalid param`）。
+
+```python
+for i in range(0, len(blocks), 20):
+    batch = blocks[i:i+20]
+    requests.post(f\".../children\", json={\"children\": batch, \"index\": -1})
+```
+
+## 5. 分类器子串匹配陷阱
 
 `auto_route()` 的关键词匹配使用 `kw.lower() in text.lower()`（子串匹配），导致：
 

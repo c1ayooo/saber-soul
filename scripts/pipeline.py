@@ -81,7 +81,7 @@ def pipeline_write(
     product: str = "",
     component: str = "",
     skip_poc_check: bool = False,
-    skip_dedup: bool = True,
+    skip_dedup: bool = False,
     llm_fallback_cmd: str | None = None,
     user_decision: str | None = None,  # "proceed" / "abort"
 ) -> dict:
@@ -95,7 +95,7 @@ def pipeline_write(
         product: 受影响产品
         component: 受影响组件
         skip_poc_check: 跳过 POC 检查
-        skip_dedup: 跳过查重（默认 True，省一次 API 调用）
+        skip_dedup: 跳过查重（默认 False，命中直接返回已有文档链接）
         llm_fallback_cmd: LLM 分类脚本命令（关键词不命中时调用）
         user_decision: 用户对 POC 缺失的决策（"proceed"/"abort"）
 
@@ -130,7 +130,7 @@ def pipeline_write(
         if blocking:
             return {"status": "error", "error": f"Pre-Check 失败: {blocking}", "verify": _vr(pre)}
 
-    # ── Step 2: Dedup（查重，默认跳过省 HTTP 调用） ──
+    # ── Step 2: Dedup（查重，命中直接返回链接） ──
     existing_token = None
     if not skip_dedup:
         logger.info("=== Step 2: Dedup ===")
@@ -138,10 +138,20 @@ def pipeline_write(
         existing = doc.search(search_key)
         if existing:
             for item in existing:
-                if item.get("title") == title or (cve_id and cve_id in item.get("title", "")):
-                    existing_token = item.get("id") or item.get("node_token", "")
-                    logger.info("文档已存在: %s，将更新而非新建", item.get("title"))
-                    break
+                match_title = item.get("title", "")
+                if match_title == title or (cve_id and cve_id in match_title):
+                    node_token = item.get("id") or item.get("node_token", "") or item.get("url", "")
+                    # 提取纯 token 部分
+                    if "/" in node_token:
+                        node_token = node_token.rsplit("/", 1)[-1]
+                    doc_url = f"https://bytedance.feishu.cn/docx/{node_token}"
+                    logger.info("文档已存在: %s → %s", match_title, doc_url)
+                    return {
+                        "status": "already_exists",
+                        "doc_url": doc_url,
+                        "doc_token": node_token,
+                        "title": match_title,
+                    }
 
     # ── Step 3: Route（分类） ──
     logger.info("=== Step 3: Route ===")
@@ -395,7 +405,7 @@ def main():
     pw.add_argument("--product", default="")
     pw.add_argument("--component", default="")
     pw.add_argument("--skip-poc-check", action="store_true")
-    pw.add_argument("--dedup", action="store_true", help="启用查重（默认跳过以节省 API 调用）")
+    pw.add_argument("--skip-dedup", action="store_true", help="跳过查重（默认启用，命中直接返回链接）")
     pw.add_argument("--llm-fallback-cmd")
     pw.add_argument("--user-decision", choices=["proceed", "abort"])
 
@@ -432,7 +442,7 @@ def main():
             product=args.product,
             component=args.component,
             skip_poc_check=args.skip_poc_check,
-            skip_dedup=not args.dedup,
+            skip_dedup=args.skip_dedup,
             llm_fallback_cmd=args.llm_fallback_cmd,
             user_decision=args.user_decision,
         )

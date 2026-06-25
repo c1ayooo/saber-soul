@@ -833,6 +833,175 @@ class FeishuDoc:
                         }]
                     })
 
+    # ═══ 图片插入（三步法封装）════════════════════════════════
+
+    def insert_image(self, doc_token: str, image_path: str, index: int = 0) -> str:
+        """
+        向飞书文档插入图片（建块 → 上传 → 填内容）。
+        返回图片块的 block_id。
+        上传失败不会残留空块（使用 api_request_with_retry）。
+        """
+        # 1. 上传图片到 Drive
+        file_token = self._upload_image(image_path, parent_node=doc_token)
+
+        # 2. 建图片块并填入 file_token
+        api_request_with_retry("POST",
+            f"/docx/v1/documents/{doc_token}/blocks/{doc_token}/children",
+            body={
+                "children": [{"block_type": 27, "image": {"file_token": file_token, "width": 800}}],
+                "index": index,
+            },
+            timeout=30,
+        )
+        logger.info("图片已插入 doc=%s index=%d file_token=%s", doc_token[:12], index, file_token[:12])
+
+        # 3. 清理可能残留的空块
+        self.cleanup_empty_images(doc_token)
+
+        return file_token
+
+    # ═══ Excalidraw 渲染 ════════════════════════════════════
+
+    @staticmethod
+    def render_excalidraw(input_path: str, output_path: str | None = None, scale: int = 2) -> str:
+        """
+        将 Excalidraw .excalidraw 文件渲染为 PNG。
+        依赖：cairosvg（hermes-agent venv）+ ~/.fonts/msyh.ttc
+
+        Args:
+            input_path: .excalidraw 文件路径
+            output_path: 输出 PNG 路径，默认替换后缀为 .png
+            scale: 缩放倍率（2=高清）
+
+        Returns:
+            输出 PNG 路径
+        """
+        if output_path is None:
+            output_path = input_path.replace(".excalidraw", ".png")
+
+        import json, math
+
+        venv_python = "/home/c1ay/.hermes/hermes-agent/venv/bin/python3"
+        if not os.path.exists(venv_python):
+            # 降级到系统 python3
+            venv_python = "python3"
+
+        # 渲染逻辑：将 excalidraw JSON 转为 SVG → cairosvg 转 PNG
+        # 使用子进程调用 venv 中的 cairosvg
+        with open(input_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        elements = data.get("elements", [])
+
+        # 分离容器绑定文本、其他元素
+        texts_c, others, containers = [], [], {}
+        for el in elements:
+            t = el.get("type")
+            if t == "text" and el.get("containerId"):
+                texts_c.append(el)
+                if el["containerId"] not in containers:
+                    containers[el["containerId"]] = None
+            else:
+                others.append(el)
+                if el.get("id"):
+                    containers[el["id"]] = el
+
+        # 计算画布边界
+        min_x = min_y = float("inf")
+        max_x = max_y = float("-inf")
+        for el in elements:
+            if el.get("type") == "text" and el.get("containerId"):
+                c = containers.get(el["containerId"])
+                if c:
+                    min_x = min(min_x, c["x"]); max_x = max(max_x, c["x"] + c["width"])
+                    min_y = min(min_y, c["y"]); max_y = max(max_y, c["y"] + c["height"])
+                    continue
+            ex, ey = el.get("x", 0), el.get("y", 0)
+            ew = el.get("width", 100) if el.get("type") != "arrow" else 0
+            eh = el.get("height", 100) if el.get("type") != "arrow" else 0
+            min_x, max_x = min(min_x, ex), max(max_x, ex + ew)
+            min_y, max_y = min(min_y, ey), max(max_y, ey + eh)
+
+        pad = 40
+        w = int(max_x - min_x + pad * 2)
+        h = int(max_y - min_y + pad * 2)
+        ox, oy = min_x - pad, min_y - pad
+
+        def px(x): return f"{x - ox:.0f}"
+        def py(y): return f"{y - oy:.0f}"
+
+        svg_parts = [
+            f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" viewBox="0 0 {w} {h}">',
+            f'<rect width="{w}" height="{h}" fill="white"/>',
+        ]
+
+        for el in others:
+            t, ex, ey = el.get("type"), el.get("x", 0), el.get("y", 0)
+            ew, eh = el.get("width", 100), el.get("height", 100)
+            bg, sc, sw = el.get("backgroundColor", "transparent"), el.get("strokeColor", "#1e1e1e"), el.get("strokeWidth", 2)
+            if t == "rectangle":
+                rx = 8 if el.get("roundness", {}).get("type") == 3 else 0
+                svg_parts.append(f'<rect x="{px(ex)}" y="{py(ey)}" width="{ew:.0f}" height="{eh:.0f}" rx="{rx}" fill="{bg}" stroke="{sc}" stroke-width="{sw}"/>')
+            elif t == "ellipse":
+                svg_parts.append(f'<ellipse cx="{px(ex+ew/2)}" cy="{py(ey+eh/2)}" rx="{ew/2:.0f}" ry="{eh/2:.0f}" fill="{bg}" stroke="{sc}" stroke-width="{sw}"/>')
+            elif t == "diamond":
+                pts = f"{px(ex+ew/2)},{py(ey)} {px(ex+ew)},{py(ey+eh/2)} {px(ex+ew/2)},{py(ey+eh)} {px(ex)},{py(ey+eh/2)}"
+                svg_parts.append(f'<polygon points="{pts}" fill="{bg}" stroke="{sc}" stroke-width="{sw}"/>')
+            elif t == "arrow":
+                pts = el.get("points", [[0, 0], [100, 0]])
+                sx, sy = ex + pts[0][0], ey + pts[0][1]
+                ex2, ey2 = ex + pts[-1][0], ey + pts[-1][1]
+                dash = "5,5" if el.get("strokeStyle") == "dashed" else "none"
+                svg_parts.append(f'<line x1="{px(sx)}" y1="{py(sy)}" x2="{px(ex2)}" y2="{py(ey2)}" stroke="{sc}" stroke-width="{sw}" stroke-dasharray="{dash}"/>')
+                if el.get("endArrowhead") == "arrow":
+                    ang = math.atan2(ey2 - sy, ex2 - sx)
+                    svg_parts.append(f'<polygon points="{px(ex2)},{py(ey2)} {px(ex2-10*math.cos(ang-0.4))},{py(ey2-10*math.sin(ang-0.4))} {px(ex2-10*math.cos(ang+0.4))},{py(ey2-10*math.sin(ang+0.4))}" fill="{sc}"/>')
+            elif t == "text" and not el.get("containerId"):
+                txt = el.get("text", ""); fs = el.get("fontSize", 16)
+                if not txt.strip(): continue
+                for li, l in enumerate(txt.replace("\\n", "\n").split("\n")):
+                    svg_parts.append(f'<text x="{px(ex+5)}" y="{py(ey+(li+1)*fs)}" font-size="{fs}" fill="{sc}" font-family="Microsoft YaHei, sans-serif">{l.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")}</text>')
+
+        # 容器内文字
+        for tel in texts_c:
+            txt = tel.get("text", ""); fs = tel.get("fontSize", 16)
+            cont = containers.get(tel.get("containerId", ""))
+            if not txt.strip() or not cont: continue
+            lines = txt.replace("\\n", "\n").split("\n")
+            lh = fs + 4
+            mw = max(len(l) for l in lines) if lines else 1
+            tx = cont["x"] + (cont["width"] - mw * fs * 0.55) / 2
+            ty = cont["y"] + (cont["height"] - len(lines) * lh) / 2 + fs
+            for li, l in enumerate(lines):
+                svg_parts.append(f'<text x="{px(tx)}" y="{py(ty+li*lh)}" font-size="{fs}" fill="{tel.get("strokeColor","#1e1e1e")}" font-family="Microsoft YaHei, sans-serif">{l.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")}</text>')
+
+        svg_parts.append("</svg>")
+        svg = "".join(svg_parts)
+
+        # 用 cairosvg 渲染 PNG
+        import subprocess
+        svg_path = output_path + ".svg.tmp"
+        with open(svg_path, "w", encoding="utf-8") as f:
+            f.write(svg)
+
+        try:
+            subprocess.run(
+                [venv_python, "-c", f"""
+import cairosvg
+cairosvg.svg2png(url=r'{svg_path}', write_to=r'{output_path}', scale={scale})
+print('OK')
+"""],
+                capture_output=True, text=True, timeout=30, check=True,
+            )
+            logger.info("Excalidraw 已渲染: %s", output_path)
+        except Exception as e:
+            raise RuntimeError(f"Excalidraw 渲染失败: {e}") from e
+        finally:
+            if os.path.exists(svg_path):
+                os.remove(svg_path)
+
+        return output_path
+
     # ═══ 空图片块清理 ════════════════════════════════════
 
     def cleanup_empty_images(self, doc_token: str) -> int:

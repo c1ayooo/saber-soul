@@ -433,6 +433,18 @@ def main():
     pc.add_argument("--content-file", required=True)
     pc.add_argument("--llm-fallback-cmd")
 
+    # image
+    pi = sub.add_parser("image", help="向文档插入图片")
+    pi.add_argument("--doc-token", required=True)
+    pi.add_argument("--image", required=True, help="PNG 图片路径")
+    pi.add_argument("--index", type=int, default=0, help="插入位置（默认文档开头）")
+
+    # render
+    pr = sub.add_parser("render", help="Excalidraw 渲染为 PNG")
+    pr.add_argument("--input", required=True, help=".excalidraw 文件路径")
+    pr.add_argument("--output", default="", help="输出 PNG 路径（默认替换后缀）")
+    pr.add_argument("--scale", type=int, default=2, help="缩放倍率（默认2）")
+
     args = parser.parse_args()
 
     # ── 从文件加载环境变量 ──
@@ -492,6 +504,19 @@ def main():
         result = cmd_move(args.doc_token, args.target_token)
     elif args.command == "classify":
         result = cmd_classify(args.title, args.content_file, args.llm_fallback_cmd)
+    elif args.command == "image":
+        doc = FeishuDoc()
+        try:
+            doc.insert_image(args.doc_token, args.image, args.index)
+            result = {"status": "ok", "doc_token": args.doc_token, "image": args.image, "index": args.index}
+        except Exception as e:
+            result = {"status": "error", "error": str(e)}
+    elif args.command == "render":
+        try:
+            out = FeishuDoc.render_excalidraw(args.input, args.output or None, args.scale)
+            result = {"status": "ok", "output": out}
+        except Exception as e:
+            result = {"status": "error", "error": str(e)}
     else:
         result = {"status": "error", "error": f"未知命令: {args.command}"}
 

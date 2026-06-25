@@ -393,8 +393,8 @@ class FeishuDoc:
                 api_request("PATCH", f"/docx/v1/documents/{doc_token}/blocks/batch_update",
                             body={"blocks": blocks})
 
-            # 内置验证
-            verify = self.verify_document(doc_token)
+            # 内置验证（基于本地 blocks，不走网络）
+            verify = self._inline_verify(blocks, content)
 
             return WriteResult(
                 success=True,
@@ -465,6 +465,51 @@ class FeishuDoc:
         )
 
     # ═══ 验证 ════════════════════════════════════════════
+
+    def _inline_verify(self, blocks: list[dict], raw_content: str) -> VerifyResult:
+        """
+        基于本地 blocks 做基础验证，不走网络。
+        用于 write() 内部的即时检查。
+        """
+        issues: list[str] = []
+        warnings: list[str] = []
+        score = 100
+
+        # 提取非代码块文本
+        non_code_text = self._get_non_code_text(blocks)
+        body_chars = len(non_code_text.strip())
+
+        # 1. 正文字数
+        if body_chars < 200:
+            issues.append(f"正文不足 200 字符（当前 {body_chars}）")
+            score -= 30
+
+        # 2. 禁词检测
+        cfg = get_config()
+        prohibited = cfg.prohibited_words
+        if prohibited:
+            re_prohibited = _compile_prohibited_re(prohibited)
+            found = re_prohibited.findall(non_code_text)
+            if found:
+                issues.append(f"发现禁词: {', '.join(set(found))}")
+                score -= 20
+
+        # 3. ASCII 句号检测（正文中）
+        if re.search(r'(?<!\d)\.(?!\d)', non_code_text):
+            warnings.append("正文中存在 ASCII 句号，应使用全角 。")
+
+        # 4. 代码块引导语检查
+        code_blocks = sum(1 for b in blocks if b.get("block_type") == BLOCK_CODE)
+        if code_blocks and body_chars < 300:
+            warnings.append("代码块较多但正文较少，检查是否有引导语")
+
+        return VerifyResult(
+            passed=len(issues) == 0,
+            score=max(0, score),
+            issues=issues,
+            warnings=warnings,
+            body_char_count=body_chars,
+        )
 
     def verify_document(self, doc_token: str) -> VerifyResult:
         """

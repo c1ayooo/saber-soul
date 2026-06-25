@@ -12,3 +12,4 @@ assets/*
 # IDE
 .vscode/
 .idea/
+tmp/

@@ -206,18 +206,20 @@ class ContentParser:
     # ── Block 构造 ──
 
     def _make_heading(self, text: str, level: int) -> dict:
+        heading_key = {3: "heading1", 4: "heading2", 5: "heading3", 6: "heading4", 7: "heading5", 8: "heading6"}.get(level, "text")
         return {
             "block_type": level,
-            level: {
+            heading_key: {
                 "elements": self._parse_inline(text),
                 "style": {},
             },
         }
 
     def _make_text_block(self, text: str, block_type: int = BLOCK_TEXT) -> dict:
+        content_key = {12: "bullet", 13: "ordered", 2: "text"}.get(block_type, "text")
         return {
             "block_type": block_type,
-            "text": {
+            content_key: {
                 "elements": self._parse_inline(text),
                 "style": {},
             },
@@ -846,27 +848,79 @@ class FeishuDoc:
 
         Args:
             keyword: 搜索关键词（如 CVE 编号）
-            search_type: 搜索范围（wiki / space）
+            search_type: 未使用，保留兼容
 
         Returns:
             匹配的文档列表
         """
-        from urllib.parse import quote
         import requests
         cfg = get_config()
         token = get_tenant_access_token()
 
-        # 飞书搜索 API
-        resp = requests.get(
-            f"{cfg.api_base}/search/v2/search",
-            headers={"Authorization": f"Bearer {token}"},
-            params={"query": keyword, "search_type": search_type, "page_size": 10},
-            timeout=10,
-        )
-        data = resp.json()
-        if data.get("code") != 0:
+        # 遍历根节点根据标题模糊匹配
+        try:
+            # 先获取根节点
+            resp = requests.get(
+                f"{cfg.api_base}/wiki/v2/spaces/{cfg.space_id}/nodes",
+                headers={"Authorization": f"Bearer {token}"},
+                params={"page_size": 100},
+                timeout=10,
+            )
+            data = resp.json()
+            if data.get("code") != 0:
+                return []
+            
+            results = []
+            for item in data.get("data", {}).get("items", []):
+                title = item.get("title", "")
+                if keyword.lower() in title.lower():
+                    results.append({
+                        "title": title,
+                        "node_token": item.get("node_token", ""),
+                        "id": item.get("node_token", ""),
+                    })
+            
+            # 递归搜索子节点（最多两级）
+            self._search_children(cfg.space_id, data.get("data", {}).get("items", []), 
+                                  keyword, token, cfg.api_base, results, depth=0)
+            
+            return results
+        except Exception as e:
+            logger.warning("搜索失败: %s，跳过查重", e)
             return []
-        return data.get("data", {}).get("items", [])
+
+    def _search_children(self, space_id: str, nodes: list, keyword: str, 
+                         token: str, api_base: str, results: list, depth: int = 0):
+        """递归搜索子节点中的标题匹配"""
+        if depth > 2 or not nodes:
+            return
+        import requests
+        for node in nodes:
+            nt = node.get("node_token", "")
+            if not nt:
+                continue
+            try:
+                resp = requests.get(
+                    f"{api_base}/wiki/v2/spaces/{space_id}/nodes",
+                    headers={"Authorization": f"Bearer {token}"},
+                    params={"parent_node_token": nt, "page_size": 50},
+                    timeout=10,
+                )
+                data = resp.json()
+                if data.get("code") != 0:
+                    continue
+                children = data.get("data", {}).get("items", [])
+                for child in children:
+                    title = child.get("title", "")
+                    if keyword.lower() in title.lower():
+                        results.append({
+                            "title": title,
+                            "node_token": child.get("node_token", ""),
+                            "id": child.get("node_token", ""),
+                        })
+                self._search_children(space_id, children, keyword, token, api_base, results, depth + 1)
+            except Exception:
+                continue
 
     # ═══ 内容检查（Pre-Check） ═══════════════════════════
 

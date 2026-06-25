@@ -106,7 +106,7 @@ class Config:
 
     @property
     def space_id(self) -> str:
-        return os.environ.get("FEISHU_SPACE_ID") or self._ensure_loaded().get("SPACE_ID", "")
+        return os.environ.get("FEISHU_SPACE_ID") or self._ensure_loaded().get("SPACE_ID", "") or self._ensure_loaded().get("space_id", "")
 
     @property
     def api_base(self) -> str:

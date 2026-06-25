@@ -376,9 +376,15 @@ class FeishuDoc:
 
         try:
             if doc_token:
-                # 更新现有文档
-                api_request("PATCH", f"/docx/v1/documents/{doc_token}/blocks/batch_update",
-                            body={"blocks": blocks})
+                # 更新现有文档（分批写入）
+                batch_size = 20
+                for i in range(0, len(blocks), batch_size):
+                    chunk = blocks[i:i + batch_size]
+                    api_request(
+                        "POST",
+                        f"/docx/v1/documents/{doc_token}/blocks/{doc_token}/children",
+                        body={"children": chunk},
+                    )
                 doc_url = f"https://bytedance.feishu.cn/docx/{doc_token}"
             else:
                 # 创建新文档
@@ -391,9 +397,15 @@ class FeishuDoc:
                 doc_token = resp["node"]["node_token"]
                 doc_url = f"https://bytedance.feishu.cn/docx/{doc_token}"
 
-                # 创建后写入内容
-                api_request("PATCH", f"/docx/v1/documents/{doc_token}/blocks/batch_update",
-                            body={"blocks": blocks})
+                # 创建后写入内容（分批写入）
+                batch_size = 20
+                for i in range(0, len(blocks), batch_size):
+                    chunk = blocks[i:i + batch_size]
+                    api_request(
+                        "POST",
+                        f"/docx/v1/documents/{doc_token}/blocks/{doc_token}/children",
+                        body={"children": chunk},
+                    )
 
             # 内置验证（基于本地 blocks，不走网络）
             verify = self._inline_verify(blocks, content)
@@ -804,14 +816,13 @@ class FeishuDoc:
 
     def _insert_image_block(self, doc_token: str, image_key: str):
         """向文档插入图片 block"""
-        api_request("PATCH", f"/docx/v1/documents/{doc_token}/blocks/batch_update",
-                    body={
-                        "blocks": [{
-                            "block_type": 27,
-                            "image": {
-                                "token": image_key,
-                                "width": 800,
-                            },
+        api_request("POST", f"/docx/v1/documents/{doc_token}/blocks/{doc_token}/children",
+                    body={"children": [{
+                        "block_type": 27,
+                        "image": {
+                            "token": image_key,
+                            "width": 800,
+                        },
                         }]
                     })
 

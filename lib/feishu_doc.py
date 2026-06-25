@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from .config import get_config, _compile_prohibited_re
-from .feishu_auth import api_request, get_tenant_access_token
+from .feishu_auth import api_request, api_request_with_retry, get_tenant_access_token
 
 logger = logging.getLogger("saber.feishu_doc")
 

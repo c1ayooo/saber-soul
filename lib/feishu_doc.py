@@ -833,6 +833,40 @@ class FeishuDoc:
                         }]
                     })
 
+    # ═══ 空图片块清理 ════════════════════════════════════
+
+    def cleanup_empty_images(self, doc_token: str) -> int:
+        """
+        扫描文档，删除 token 为空的图片块（上传失败残留）。
+        返回删除的块数。
+        """
+        url = f"/docx/v1/documents/{doc_token}/blocks/{doc_token}/children?page_size=100"
+        try:
+            data = api_request("GET", url)
+        except RuntimeError:
+            return 0
+        items = data.get("items", [])
+        to_delete = []
+        for i, block in enumerate(items):
+            if block.get("block_type") == 27:  # image
+                img = block.get("image", {}) or {}
+                if not img.get("token", ""):
+                    to_delete.append(i)
+        if not to_delete:
+            return 0
+        # 从后往前删，避免索引偏移
+        deleted = 0
+        for idx in reversed(to_delete):
+            try:
+                url = f"/docx/v1/documents/{doc_token}/blocks/{doc_token}/children/batch_delete"
+                api_request("DELETE", url, body={"start_index": idx, "end_index": idx + 1})
+                deleted += 1
+            except RuntimeError:
+                pass
+        if deleted:
+            logger.info("清理了 %d 个空图片块", deleted)
+        return deleted
+
     # ═══ 节点排序 ════════════════════════════════════════
 
     def reorder(self, parent_token: str, child_tokens: list[str]) -> bool:

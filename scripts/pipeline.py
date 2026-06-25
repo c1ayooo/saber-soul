@@ -121,7 +121,7 @@ def pipeline_write(
         return poc_decision
 
     # ── Step 1: Pre-Check ──
-    logger.info("=== Step 1: Pre-Check ===")
+    logger.info("[1/6] Pre-Check")
     pre = doc.pre_check(content)
     if pre.issues:
         logger.warning("Pre-Check 发现问题: %s", pre.issues)
@@ -133,7 +133,7 @@ def pipeline_write(
     # ── Step 2: Dedup（查重，命中直接返回链接） ──
     existing_token = None
     if not skip_dedup:
-        logger.info("=== Step 2: Dedup ===")
+        logger.info("[[2/6] Dedup]")
         search_key = cve_id or title
         existing = doc.search(search_key)
         if existing:
@@ -154,7 +154,7 @@ def pipeline_write(
                     }
 
     # ── Step 3: Route（分类） ──
-    logger.info("=== Step 3: Route ===")
+    logger.info("[[3/6] Route]")
     llm_cb = None
     if llm_fallback_cmd:
         def _llm_callback(prompt: str) -> str:
@@ -181,7 +181,7 @@ def pipeline_write(
         }
 
     # ── Step 4: Auto-Classify（2.4 专用） ──
-    logger.info("=== Step 4: Auto-Classify ===")
+    logger.info("[[4/6] Auto-Classify]")
     folder_token = ""
     folder_path = route_result.folder_key
 
@@ -204,7 +204,7 @@ def pipeline_write(
             }
 
     # ── Step 5: Write ──
-    logger.info("=== Step 5: Write ===")
+    logger.info("[[5/6] Write]")
     result = doc.write(
         title=title,
         content=content,
@@ -220,7 +220,7 @@ def pipeline_write(
         return _ok(result, verify, folder_path)
 
     # ── Step 7: Fix Loop ──
-    logger.info("=== Step 7: Fix Loop ===")
+    logger.info("[[6/6] Verify]")
     for attempt in range(1, 4):
         logger.info("修复尝试 %d/3 ...", attempt)
         fix_r = doc.fix_document(result.doc_token)
@@ -408,6 +408,8 @@ def main():
     pw.add_argument("--skip-dedup", action="store_true", help="跳过查重（默认启用，命中直接返回链接）")
     pw.add_argument("--llm-fallback-cmd")
     pw.add_argument("--user-decision", choices=["proceed", "abort"])
+    pw.add_argument("--verbose", action="store_true", help="输出详细进度")
+    pw.add_argument("--env-file", default="", help="从文件加载环境变量（eg: /path/to/.env）")
 
     # organize
     sub.add_parser("organize", help="扫描垃圾和错位文档")
@@ -433,8 +435,30 @@ def main():
 
     args = parser.parse_args()
 
+    # ── 从文件加载环境变量 ──
+    env_file = getattr(args, 'env_file', '') or ''
+    if env_file:
+        env_path = Path(env_file)
+        if env_path.exists():
+            with open(env_path) as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        k, v = line.split('=', 1)
+                        os.environ[k.strip()] = v.strip().strip("\"'")
+
+    # ── 日志级别 ──
+    verbose = getattr(args, 'verbose', False)
+    if verbose:
+        logging.getLogger('saber').setLevel(logging.DEBUG)
+
+    def log_step(step: str, msg: str = ""):
+        if verbose:
+            logger.info("▶ [%s] %s", step, msg)
+
     if args.command == "write":
         content = Path(args.content_file).read_text(encoding="utf-8")
+        log_step("1/7", "Pre-Check")
         result = pipeline_write(
             title=args.title,
             content=content,
@@ -446,6 +470,17 @@ def main():
             llm_fallback_cmd=args.llm_fallback_cmd,
             user_decision=args.user_decision,
         )
+
+        # 写入成功后清理空图片块
+        if result.get("status") in ("ok", "partial") and result.get("doc_token"):
+            log_step("7/7", "清理空图片块")
+            doc = FeishuDoc()
+            try:
+                cleaned = doc.cleanup_empty_images(result["doc_token"])
+                if cleaned:
+                    logger.info("post-write: 清理了 %d 个空图片块", cleaned)
+            except Exception:
+                pass
 
     elif args.command == "organize":
         result = cmd_organize()

@@ -43,13 +43,16 @@
 ```
 漏洞文档
   ↓ Step A：大类判断
-  → 内核/驱动/LPE ⇒ 1.4
+  → linux kernel漏洞 / linux 内核漏洞 ⇒ 1.4
+  → 内核漏洞 ⇒ 1.4
   → 网络设备/安全设备 ⇒ 2.3
   → 其余 ⇒ 2.4
   ↓ Step B：5 个子目录（auto_classifier 映射表）
   ↓ Step C：厂商/产品分层（自动 GET → POST 创建 docx 当文件夹）
   → 输出: 2.4/子目录/厂商/产品/CVE-xxx
 ```
+
+> ⚠️ non_24_routes 关键词必须足够具体（如 `linux kernel漏洞`），不能是 `LPE`、`本地提权` 这类 Windows/Linux 共享的通用术语，以免误路由。
 
 ### 缓存机制
 - 会话内查过的 folder_token 缓存到内存 dict

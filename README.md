@@ -14,21 +14,49 @@
 需要自行注册一个飞书应用，获得 `APP_ID` 和 `APP_SECRET`：
 
 1. 打开 [飞书开发者控制台](https://open.feishu.cn/app) → 创建企业自建应用
-2. 开通权限：`wiki:wiki`、`wiki:wiki:readonly`、`docx:document`
+2. 开通权限：`wiki:wiki`、`wiki:wiki:readonly`、`docx:document`、`docx:document:readonly`
 3. **发布应用**（添加权限后必须发布才生效）
-4. 把应用加到目标知识库成员（管理员角色）
 
 > 如果只需要分类器功能、不写知识库，可以跳过此步骤。见「独立模块复用」。
 
-### 2. 配置
+### 2. 把应用添加为知识库管理员
+
+应用发布后不会自动获得任何知识库的权限——**需要手动把应用加为目标知识库的成员**，否则 API 写入会报 `permission denied`。
+
+**操作步骤：**
+1. 打开目标知识库（飞书 → 左侧「知识库」→ 进入空间）
+2. 右上角「···」→ 「空间设置」
+3. 左侧「成员管理」
+4. 点击「添加成员」，搜索你的应用名称（就是飞书开发者控制台里创建的应用名）
+5. 角色选「管理员」
+6. 确认添加
+
+**原理：** 飞书知识库的 API 调用权限以成员身份绑定。应用即使获得了 `wiki:wiki` 权限，如果没被加入知识库成员，也没有写入权限。应用作为一个「机器人成员」存在于知识库中。
+
+### 3. 配置
+
+#### 作为 Hermes Skill 使用（自动配）
+
+当通过 Hermes Agent 加载本技能时，`FEISHU_APP_ID` 和 `FEISHU_APP_SECRET` 由飞书接入配置自动注入，**无需手动填写**。
+
+只需要设置知识库 Space ID：
+
+```bash
+# 在 Hermes 中设置
+hermes set-env FEISHU_SPACE_ID=xxx
+```
+
+> `FEISHU_SPACE_ID` 怎么拿？打开知识库首页，URL 中 `.../wiki/space/xxxxxxxx` 即为 space_id。
+
+#### 独立 CLI 使用（手动配）
 
 ```bash
 export FEISHU_APP_ID=cli_xxx
 export FEISHU_APP_SECRET=xxx
-export FEISHU_SPACE_ID=xxx   # 知识库 space_id
+export FEISHU_SPACE_ID=xxx
 ```
 
-或在 `feishu_config.json` 中配置（运行 `init_config.py` 自动生成）。
+或在 `feishu_config.json` 中配置（运行 `init_config.py` 自动扫描目录树生成）。
 
 ---
 
@@ -113,10 +141,10 @@ Pre-Check → Dedup查重 → Route分类 → Auto-Classify建文件夹 → Writ
 
 | 变量 | 必须 | 说明 |
 |------|:----:|------|
-| `FEISHU_APP_ID` | ✅ | 飞书应用 ID |
-| `FEISHU_APP_SECRET` | ✅ | 飞书应用密钥 |
+| `FEISHU_APP_ID` | 独立CLI | 飞书应用 ID（Hermes 技能模式由接入配置自动注入） |
+| `FEISHU_APP_SECRET` | 独立CLI | 飞书应用密钥 |
 | `FEISHU_SPACE_ID` | ✅ | 知识库 space_id |
-| `SABER_CONFIG_DIR` | ❌ | 自定义配置目录（默认 `~/.hermes/skills/saber_soul`） |
+| `SABER_CONFIG_DIR` | ❌ | 自定义配置目录（默认脚本所在目录） |
 
 详细配置见 `references/feishu-operations.md`。
 

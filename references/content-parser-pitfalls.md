@@ -110,9 +110,58 @@ def search(self, keyword):
 
 4. 分批写入（每批 ≤20）
    POST /docx/v1/documents/{doc}/blocks/{doc}/children
-     json={"children": batch, "index": -1}
+     json={"children": batch}
 
 5. 验证
-   GET /docx/v1/documents/{doc}/blocks/{doc}/children?page_size=5
-   → 检查 len(items) > 0
+   GET /docx/v1/documents/{doc}/blocks?page_size=1
+   → 检查 items 非空
 ```
+
+## 9. Feishu API batch_update 已废弃（2026-06）
+
+```python
+# ❌ 旧 API（已返回 400）
+PATCH /docx/v1/documents/{doc_token}/blocks/batch_update
+  body={"blocks": [...]}
+# → HTTP 400 "requests is required"（旧接口已下线）
+
+# ✅ 新 API
+POST /docx/v1/documents/{doc_token}/blocks/{doc_token}/children
+  body={"children": [block1, block2, ...]}
+```
+
+**涉及入口：** `write()` 创建新文档、`write()` 更新已有文档、`_insert_image_block()`。
+
+**已知变更原因：** 飞书 docx v1 API 在 2026 年中将 block 写入接口从 `batch_update` 迁移到 `children` 端点。
+`PATCH /blocks/batch_update` endpoint 还活着但 body 结构已变（需要 `requests` 数组），不如直接用 `POST children` 更简洁可靠。
+
+## 10. 分类器 non_24_routes 太宽泛导致误判
+
+`non_24_routes` 定义在 `references/classification_config.json`，用于将 2.4（CVE）的某些非 2.4 类别重路由到其他目录。
+
+```json
+{
+  "LPE": "1.4",      # ← 太宽泛！Windows LPE 也被路由到 1.4 代码审计
+  "本地提权": "1.4", # ← 同样问题
+  "linux kernel": "1.4"  # ← 安全，仅匹配 linux kernel
+}
+```
+
+**教训：** non_24 关键词必须是**独一无二的**，不能是通用安全术语。Windows 和 Linux 共享的安全概念（LPE、提权、Persistence）不能用在此处。
+
+**正确做法：** 用更具体的关键词：
+```json
+{
+  "linux kernel漏洞": "1.4",
+  "linux 内核漏洞": "1.4"
+}
+```
+
+## 11. CVE 规则关键词 "EXP" 过短导致误判
+
+CVE 规则 `weight=3`，关键词包含 `EXP`（仅 3 字符）。文档中任何 `EXP` 子串（如 `LPE EXP`、`EXP 的 KB 映射表`）都会触发。
+
+**修复：** 在 CVE 规则 `negative_keywords` 中添加排除词：
+- `内网`、`内网渗透`、`信息收集`、`存活探测` — 防止 info-gather 文档被误判
+
+**通用原则：** 任何 ≤4 字符的关键词都应在 `negative_keywords` 中有对应的排除覆盖，或者在文档正文中避免使用。

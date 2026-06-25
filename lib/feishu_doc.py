@@ -394,7 +394,8 @@ class FeishuDoc:
                     "node_type": "origin",
                     "title": title,
                 })
-                doc_token = resp["node"]["node_token"]
+                node_token = resp["node"]["node_token"]
+                doc_token = resp["node"].get("obj_token", node_token)
                 doc_url = f"https://bytedance.feishu.cn/docx/{doc_token}"
 
                 # 创建后写入内容（分批写入）

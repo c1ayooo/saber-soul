@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from .config import get_config, _compile_prohibited_re
-from .feishu_auth import api_request
+from .feishu_auth import api_request, get_tenant_access_token
 
 logger = logging.getLogger("saber.feishu_doc")
 
@@ -740,8 +740,7 @@ class FeishuDoc:
         """上传图片到飞书，返回 image_key"""
         import requests
         cfg = get_config()
-        token = __import__("saber_soul.lib.feishu_auth", fromlist=["get_tenant_access_token"]) \
-            .get_tenant_access_token()
+        token = get_tenant_access_token()
 
         with open(image_path, "rb") as f:
             resp = requests.post(
@@ -758,7 +757,6 @@ class FeishuDoc:
 
     def _insert_image_block(self, doc_token: str, image_key: str):
         """向文档插入图片 block"""
-        from .feishu_auth import get_tenant_access_token
         api_request("PATCH", f"/docx/v1/documents/{doc_token}/blocks/batch_update",
                     body={
                         "blocks": [{
@@ -811,8 +809,7 @@ class FeishuDoc:
         from urllib.parse import quote
         import requests
         cfg = get_config()
-        token = __import__("saber_soul.lib.feishu_auth", fromlist=["get_tenant_access_token"]) \
-            .get_tenant_access_token()
+        token = get_tenant_access_token()
 
         # 飞书搜索 API
         resp = requests.get(

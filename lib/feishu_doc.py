@@ -736,7 +736,7 @@ class FeishuDoc:
 
         # Step 3: 上传飞书图片并插入文档
         try:
-            image_key = self._upload_image(final_path)
+            image_key = self._upload_image(final_path, parent_node=doc_token)
             self._insert_image_block(doc_token, image_key)
             logger.info("图表已插入文档: %s", doc_token[:16])
             return True
@@ -750,30 +750,28 @@ class FeishuDoc:
                     os.unlink(f)
 
     def _mermaid_to_png(self, mermaid_text: str) -> str | None:
-        """Mermaid 文本 → PNG 文件"""
-        tmp_mmd = tempfile.NamedTemporaryFile(mode="w", suffix=".mmd", delete=False)
-        tmp_png = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
-        tmp_mmd.write(mermaid_text)
-        tmp_mmd.close()
-        tmp_png.close()
+        """Mermaid 文本 → PNG 文件（通过 mermaid.ink API）"""
+        import base64
+        import urllib.request
 
         try:
-            result = subprocess.run(
-                ["mmdc", "-i", tmp_mmd.name, "-o", tmp_png.name, "-b", "white"],
-                capture_output=True, text=True, timeout=30,
-            )
-            if result.returncode != 0:
-                logger.error("mmdc 渲染失败: %s", result.stderr)
-                return None
+            # mermaid.ink 使用 base64 编码
+            encoded = base64.urlsafe_b64encode(mermaid_text.encode("utf-8")).decode()
+            url = f"https://mermaid.ink/img/{encoded}"
+
+            tmp_png = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+            tmp_png.close()
+
+            req = urllib.request.Request(url, headers={
+                "User-Agent": "Mozilla/5.0 (compatible; SaberSoul/1.0)",
+            })
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                with open(tmp_png.name, "wb") as f:
+                    f.write(resp.read())
             return tmp_png.name
-        except FileNotFoundError:
-            logger.error("mmdc 命令未安装，请运行: npm install -g @mermaid-js/mermaid-cli")
+        except Exception as e:
+            logger.error("mermaid.ink 渲染失败: %s", e)
             return None
-        except subprocess.TimeoutExpired:
-            logger.error("mmdc 渲染超时")
-            return None
-        finally:
-            os.unlink(tmp_mmd.name)
 
     def _crop_png(self, png_path: str) -> str | None:
         """裁剪 PNG 白边"""
@@ -796,24 +794,32 @@ class FeishuDoc:
             logger.warning("Pillow 未安装，跳过裁剪")
             return None
 
-    def _upload_image(self, image_path: str) -> str:
-        """上传图片到飞书，返回 image_key"""
+    def _upload_image(self, image_path: str, parent_node: str = "") -> str:
+        """上传图片到飞书 Drive，返回可用于 docx 的 file_token"""
         import requests
         cfg = get_config()
         token = get_tenant_access_token()
 
+        file_name = Path(image_path).name
+        file_size = Path(image_path).stat().st_size
+
         with open(image_path, "rb") as f:
             resp = requests.post(
-                f"{cfg.api_base}/im/v1/images",
+                f"{cfg.api_base}/drive/v1/medias/upload_all",
                 headers={"Authorization": f"Bearer {token}"},
-                files={"image": f},
-                data={"image_type": "message"},
+                files={"file": (file_name, f, "image/png")},
+                data={
+                    "file_name": file_name,
+                    "parent_type": "docx_image",
+                    "parent_node": parent_node,
+                    "size": str(file_size),
+                },
                 timeout=30,
             )
         data = resp.json()
         if data.get("code") != 0:
             raise RuntimeError(f"图片上传失败: {data}")
-        return data["data"]["image_key"]
+        return data["data"]["file_token"]
 
     def _insert_image_block(self, doc_token: str, image_key: str):
         """向文档插入图片 block"""
@@ -821,7 +827,7 @@ class FeishuDoc:
                     body={"children": [{
                         "block_type": 27,
                         "image": {
-                            "token": image_key,
+                            "file_token": image_key,
                             "width": 800,
                         },
                         }]

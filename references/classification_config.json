@@ -1,0 +1,1231 @@
+{
+  "doc_type_rules": [
+    {
+      "keywords": [
+        "CVE-",
+        "CVSS",
+        "漏洞编号",
+        "CNVD-",
+        "CNNVD-",
+        "影响组件",
+        "漏洞原理",
+        "利用条件",
+        "漏洞利用",
+        "攻击链路",
+        "漏洞分析",
+        "漏洞复现",
+        "漏洞情报",
+        "修复版本",
+        "不受影响版本",
+        "安全更新",
+        "漏洞修复",
+        "PoC",
+        "EXP",
+        "漏洞验证",
+        "复现步骤"
+      ],
+      "negative_keywords": [
+        "PoC脚本",
+        "漏洞扫描工具",
+        "批量验证脚本"
+      ],
+      "folder": "2.4",
+      "type": "cve",
+      "weight": 3
+    },
+    {
+      "keywords": [
+        "信息收集",
+        "暴露面",
+        "端口扫描",
+        "子域名",
+        "指纹识别",
+        "目标域名",
+        "目标系统",
+        "测试时间",
+        "测试人员",
+        "授权范围",
+        "渗透打点",
+        "Web探测",
+        "目录枚举",
+        "接口枚举",
+        "参数发现",
+        "旁站",
+        "C段",
+        "关联资产",
+        "同IP",
+        "关键发现",
+        "风险矩阵",
+        "风险等级",
+        "修复建议",
+        "复测状态"
+      ],
+      "negative_keywords": [
+        "内网",
+        "域控",
+        "应急响应",
+        "等保",
+        "合规"
+      ],
+      "folder": "1.1",
+      "type": "作战记录"
+    },
+    {
+      "keywords": [
+        "JS分析",
+        "JS逆向",
+        "JavaScript逆向",
+        ".js",
+        "加密逻辑",
+        "加密算法",
+        "签名算法",
+        "密钥硬编码",
+        "解密函数",
+        "接口提取",
+        "API接口",
+        "敏感信息泄露",
+        "硬编码密钥",
+        "webpack",
+        "Source Map",
+        ".map",
+        "混淆代码",
+        "前端加密",
+        "JS文件",
+        "函数定位",
+        "调用栈",
+        "加解密函数"
+      ],
+      "negative_keywords": [
+        "JS分析详见",
+        "关联作战记录"
+      ],
+      "folder": "1.1",
+      "type": "JS逆向分析"
+    },
+    {
+      "keywords": [
+        "内网",
+        "域控",
+        "域渗透",
+        "AD域",
+        "工作组",
+        "域环境",
+        "Kerberos",
+        "黄金票据",
+        "白银票据",
+        "票据传递",
+        "Pass-the-Hash",
+        "Pass-the-Ticket",
+        "NTLM",
+        "SPN",
+        "横向移动",
+        "横向渗透",
+        "凭证获取",
+        "会话劫持",
+        "权限提升",
+        "提权",
+        "本地提权",
+        "LPE",
+        "C2",
+        "隧道",
+        "端口转发",
+        "代理隧道",
+        "DNS隧道",
+        "防御检测",
+        "日志痕迹",
+        "规避技巧",
+        "免杀"
+      ],
+      "negative_keywords": [
+        "WAF绕过",
+        "信息收集",
+        "暴露面",
+        "打点"
+      ],
+      "folder": "1.2",
+      "type": "内网渗透"
+    },
+    {
+      "keywords": [
+        "安装",
+        "配置",
+        "基础用法",
+        "高级用法",
+        "使用手册",
+        "GitHub",
+        "Releases",
+        "下载地址",
+        "官方文档",
+        "场景示例",
+        "实战场景",
+        "参数说明",
+        "工具",
+        "扫描器",
+        "插件"
+      ],
+      "negative_keywords": [
+        "CVE-",
+        "漏洞分析",
+        "漏洞复现",
+        "PoC脚本",
+        "漏洞利用"
+      ],
+      "folder": "1.3",
+      "type": "工具文档"
+    },
+    {
+      "keywords": [
+        "代码审计",
+        "白盒",
+        "审计报告",
+        "审计目标",
+        "审计方法",
+        "漏洞挖掘",
+        "危险函数",
+        "调用链",
+        "漏洞概览",
+        "漏洞详情",
+        "靶场",
+        "逆向",
+        "反编译",
+        "反序列化利用链",
+        "Java安全",
+        "反序列化",
+        "Gadget",
+        "利用链分析"
+      ],
+      "negative_keywords": [
+        "JS逆向",
+        "JavaScript逆向",
+        "WAF绕过"
+      ],
+      "folder": "1.4",
+      "type": "代码审计"
+    },
+    {
+      "keywords": [
+        "方法论",
+        "攻击思路",
+        "绕过思路",
+        "知识库",
+        "进化版",
+        "实战方法论",
+        "决策树",
+        "分类体系",
+        "WAF绕过",
+        "WAF Bypass",
+        "绕过技术",
+        "Bypass",
+        "CDN绕过",
+        "防护绕过",
+        "攻击面",
+        "攻击面整理",
+        "攻击面全景",
+        "经验总结",
+        "技巧总结",
+        "知识整理"
+      ],
+      "negative_keywords": [
+        "CVE-",
+        "漏洞分析",
+        "漏洞复现",
+        "应急响应",
+        "等保"
+      ],
+      "folder": "1.5",
+      "type": "思路整理"
+    },
+    {
+      "keywords": [
+        "资产台账",
+        "资产清单",
+        "资产盘点",
+        "巡检",
+        "漏洞巡检",
+        "安全巡检",
+        "日常巡检",
+        "告警",
+        "SIEM",
+        "SOAR",
+        "态势感知",
+        "告警研判",
+        "告警处置",
+        "误报",
+        "闭环率",
+        "运营目标",
+        "运营指标",
+        "关键指标",
+        "SLA达标率"
+      ],
+      "negative_keywords": [
+        "应急响应",
+        "事件处置",
+        "入侵溯源"
+      ],
+      "folder": "2.1",
+      "type": "安全运营"
+    },
+    {
+      "keywords": [
+        "应急响应",
+        "应急",
+        "事件处置",
+        "事件概述",
+        "事件名称",
+        "事件等级",
+        "发现时间",
+        "影响范围",
+        "受影响系统",
+        "数据泄露评估",
+        "攻击链路",
+        "攻击链路复盘",
+        "入口点",
+        "根因分析",
+        "漏洞根因",
+        "处置过程",
+        "隔离措施",
+        "取证操作",
+        "清除后门",
+        "勒索",
+        "挖矿",
+        "Webshell",
+        "后门",
+        "入侵溯源",
+        "复盘",
+        "改进建议",
+        "复盘总结"
+      ],
+      "negative_keywords": [
+        "等保",
+        "合规",
+        "日常运营"
+      ],
+      "folder": "2.2",
+      "type": "应急响应"
+    },
+    {
+      "keywords": [
+        "防火墙",
+        "WAF",
+        "IPS",
+        "IDS",
+        "堡垒机",
+        "安全设备",
+        "网络设备",
+        "边界安全",
+        "策略调优",
+        "策略变更",
+        "策略优化",
+        "配置说明",
+        "设备运维",
+        "设备信息",
+        "运维操作",
+        "故障处理",
+        "天融信",
+        "深信服",
+        "华为防火墙",
+        "山石",
+        "固件升级",
+        "规则版本",
+        "版本升级"
+      ],
+      "negative_keywords": [
+        "WAF绕过",
+        "漏洞分析",
+        "攻击"
+      ],
+      "folder": "2.3",
+      "type": "设备运维"
+    },
+    {
+      "keywords": [
+        "等保",
+        "定级",
+        "备案",
+        "测评",
+        "等级保护",
+        "测评要求",
+        "定级依据",
+        "测评扣分点",
+        "安全管理制度",
+        "安全管理机构",
+        "等保2.0",
+        "等保三级"
+      ],
+      "negative_keywords": [
+        "应急响应",
+        "漏洞"
+      ],
+      "folder": "3.1",
+      "type": "等保"
+    },
+    {
+      "keywords": [
+        "合规自查",
+        "自查清单",
+        "自查项",
+        "自查范围",
+        "风险评估",
+        "合规风险",
+        "CIS",
+        "GDPR",
+        "PDPA",
+        "ISO27001",
+        "合规标准",
+        "合规检查"
+      ],
+      "negative_keywords": [
+        "整改台账",
+        "整改方案",
+        "等保"
+      ],
+      "folder": "3.2",
+      "type": "合规自查"
+    },
+    {
+      "keywords": [
+        "整改",
+        "台账",
+        "SLA",
+        "不符合项",
+        "整改措施",
+        "整改清单",
+        "整改方案",
+        "整改台账",
+        "整改记录",
+        "整改期限",
+        "验收报告",
+        "证据材料"
+      ],
+      "negative_keywords": [
+        "合规自查",
+        "等保定级"
+      ],
+      "folder": "3.3",
+      "type": "整改台账"
+    },
+    {
+      "keywords": [
+        "python",
+        "脚本",
+        "扫描器",
+        "PoC脚本",
+        "Python脚本",
+        "py脚本",
+        "argparse",
+        "requests库",
+        "批量检测",
+        "自动化脚本"
+      ],
+      "negative_keywords": [
+        "CVE-",
+        "漏洞分析",
+        "PoC复现"
+      ],
+      "folder": "4.1",
+      "type": "Python脚本"
+    },
+    {
+      "keywords": [
+        "go ",
+        "golang",
+        "Go语言",
+        "Go工具",
+        "并发扫描",
+        "跨平台工具",
+        "go build",
+        "go mod",
+        "高并发",
+        "goroutine"
+      ],
+      "negative_keywords": [
+        "gost",
+        "go语言隧道"
+      ],
+      "folder": "4.2",
+      "type": "Go工具"
+    },
+    {
+      "keywords": [
+        "自动化",
+        "巡检脚本",
+        "定时任务",
+        "告警联动",
+        "自动化检测",
+        "自动化运维",
+        "cron",
+        "定时执行",
+        "自动化平台",
+        "告警自动化",
+        "自动化筛选"
+      ],
+      "negative_keywords": [
+        "Python脚本",
+        "Go工具",
+        "工具封装"
+      ],
+      "folder": "4.3",
+      "type": "自动化检测"
+    },
+    {
+      "keywords": [
+        "Docker",
+        "CI-CD",
+        "封装",
+        "部署文档",
+        "Dockerfile",
+        "容器编排",
+        "Docker Compose",
+        "镜像构建",
+        "环境标准化",
+        "工具打包",
+        "部署教程",
+        "环境配置"
+      ],
+      "negative_keywords": [
+        "Docker安全",
+        "容器安全",
+        "Docker漏洞"
+      ],
+      "folder": "4.4",
+      "type": "工具封装"
+    },
+    {
+      "keywords": [
+        "流量分析",
+        "网络流量",
+        "PCAP",
+        "流量特征",
+        "恶意流量",
+        "检测规则",
+        "检测策略",
+        "检测告警",
+        "检测引擎",
+        "Sigma",
+        "YARA",
+        "Snort",
+        "Suricata",
+        "远控",
+        "RAT",
+        "木马",
+        "流量检测",
+        "C2通信",
+        "C2特征",
+        "Beacon",
+        "威胁狩猎",
+        "Threat Hunting",
+        "狩猎规则",
+        "IOC",
+        "IOA",
+        "行为检测",
+        "异常检测",
+        "DNS隧道检测",
+        "ICMP隧道",
+        "HTTP隧道检测"
+      ],
+      "negative_keywords": [
+        "CVE-",
+        "漏洞分析",
+        "漏洞利用",
+        "应急响应"
+      ],
+      "folder": "2.5",
+      "type": "威胁检测"
+    },
+    {
+      "keywords": [
+        "论文",
+        "安全研究",
+        "技术研究",
+        "研究综述",
+        "学术论文",
+        "安全科普",
+        "入门",
+        "基础概念",
+        "基础知识",
+        "新手教程",
+        "零基础",
+        "概览",
+        "技术原理",
+        "底层原理",
+        "协议分析",
+        "源码分析",
+        "架构分析",
+        "设计原理",
+        "实现原理",
+        "安全趋势",
+        "年度报告",
+        "行业分析",
+        "安全报告"
+      ],
+      "negative_keywords": [
+        "CVE-",
+        "漏洞分析",
+        "漏洞复现",
+        "应急响应",
+        "代码审计"
+      ],
+      "folder": "5",
+      "type": "安全研究",
+      "weight": 2
+    }
+  ],
+  "vendor_product_map": {
+    "中间件组件漏洞": {
+      "Apache": [
+        "Tomcat",
+        "Struts2",
+        "Solr",
+        "OFBiz",
+        "Log4j",
+        "Shiro",
+        "HTTP Server",
+        "ActiveMQ",
+        "Kafka",
+        "SkyWalking",
+        "Dubbo",
+        "ShardingSphere"
+      ],
+      "Spring": [
+        "Spring Framework",
+        "Spring Boot",
+        "Spring Cloud",
+        "Spring Security",
+        "Spring Data",
+        "Spring Cloud Gateway",
+        "Spring WS"
+      ],
+      "Alibaba": [
+        "Fastjson",
+        "Druid",
+        "Nacos",
+        "Sentinel",
+        "XXL-JOB"
+      ],
+      "Nginx": [
+        "Nginx"
+      ],
+      "Redis": [
+        "Redis"
+      ],
+      "Grafana": [
+        "Grafana",
+        "Grafana Loki",
+        "Grafana Mimir"
+      ],
+      "Prometheus": [
+        "Prometheus",
+        "Alertmanager",
+        "Thanos"
+      ],
+      "PHP": [
+        "PHP"
+      ],
+      "Node.js": [
+        "Node.js"
+      ],
+      "Oracle": [
+        "WebLogic",
+        "MySQL",
+        "Oracle DB"
+      ],
+      "Jenkins": [
+        "Jenkins"
+      ],
+      "GitLab": [
+        "GitLab"
+      ],
+      "Atlassian": [
+        "Confluence",
+        "Jira",
+        "Bitbucket",
+        "Bamboo"
+      ],
+      "PostgreSQL": [
+        "PostgreSQL"
+      ],
+      "MongoDB": [
+        "MongoDB"
+      ],
+      "Elasticsearch": [
+        "Elasticsearch",
+        "Kibana",
+        "Logstash"
+      ],
+      "Microsoft": [
+        "IIS",
+        "SQL Server",
+        "Exchange Server"
+      ],
+      "Zabbix": [
+        "Zabbix"
+      ],
+      "Splunk": [
+        "Splunk Enterprise",
+        "Splunk Cloud",
+        "Splunk UF"
+      ],
+      "HashiCorp": [
+        "Consul",
+        "Vault",
+        "Nomad"
+      ],
+      "Memcached": [
+        "Memcached"
+      ],
+      "RabbitMQ": [
+        "RabbitMQ"
+      ],
+      "etcd": [
+        "etcd"
+      ],
+      "CouchDB": [
+        "CouchDB"
+      ],
+      "libssh2": [
+        "libssh2"
+      ]
+    },
+    "Web应用系统漏洞": {
+      "通达": [
+        "通达OA"
+      ],
+      "泛微": [
+        "e-cology",
+        "e-office",
+        "E-Mobile",
+        "E-Bridge"
+      ],
+      "致远": [
+        "Seeyon OA",
+        "A8",
+        "A6"
+      ],
+      "蓝凌": [
+        "蓝凌OA",
+        "EKP"
+      ],
+      "用友": [
+        "NC",
+        "U8",
+        "U8Cloud",
+        "YonBIP"
+      ],
+      "金蝶": [
+        "EAS",
+        "云星空",
+        "K3 Cloud"
+      ],
+      "ThinkPHP": [
+        "ThinkPHP"
+      ],
+      "Discuz!": [
+        "Discuz!"
+      ],
+      "WordPress": [
+        "WordPress"
+      ],
+      "Drupal": [
+        "Drupal"
+      ],
+      "Joomla": [
+        "Joomla"
+      ],
+      "React": [
+        "React",
+        "React Server Components",
+        "Next.js"
+      ],
+      "Vue": [
+        "Vue.js",
+        "Nuxt.js"
+      ],
+      "Laravel": [
+        "Laravel"
+      ],
+      "Django": [
+        "Django"
+      ],
+      "Ruby on Rails": [
+        "Ruby on Rails",
+        "Rails"
+      ],
+      "Confluence": [
+        "Confluence Data Center"
+      ],
+      "Jira": [
+        "Jira Software",
+        "Jira Service Management"
+      ],
+      "JeecgBoot": [
+        "JeecgBoot",
+        "JimuReport"
+      ],
+      "Vite": [
+        "Vite"
+      ]
+    },
+    "安全厂商设备漏洞": {
+      "华为": [
+        "USG 防火墙",
+        "SecoManager",
+        "AntiDDoS",
+        "OceanStor",
+        "FusionCompute"
+      ],
+      "深信服": [
+        "AF",
+        "AC",
+        "SSL VPN",
+        "EDR",
+        "SIP",
+        "AD"
+      ],
+      "奇安信": [
+        "天擎",
+        "网神 SecSSL",
+        "天守",
+        "椒图",
+        "NGSOC"
+      ],
+      "绿盟": [
+        "RSAS",
+        "WAF",
+        "SAS",
+        "NIDS",
+        "NF"
+      ],
+      "天融信": [
+        "NGFW",
+        "TOPS",
+        "TopSAP",
+        "WAF",
+        "TopAD"
+      ],
+      "启明星辰": [
+        "USG",
+        "WAF",
+        "天清汉马",
+        "天阗",
+        "天镜"
+      ],
+      "H3C": [
+        "SecPath",
+        "防火墙",
+        "ACG"
+      ],
+      "Fortinet": [
+        "FortiGate",
+        "FortiManager",
+        "FortiAnalyzer",
+        "FortiWeb",
+        "FortiNAC",
+        "FortiClient"
+      ],
+      "Citrix": [
+        "NetScaler",
+        "ADC",
+        "Gateway",
+        "XenDesktop"
+      ],
+      "F5": [
+        "BIG-IP",
+        "BIG-IQ"
+      ],
+      "Pulse Secure": [
+        "Connect Secure",
+        "Pulse Connect",
+        "Ivanti Connect Secure"
+      ],
+      "Ivanti": [
+        "Sentry",
+        "Connect Secure",
+        "Endpoint Manager",
+        "Avalanche",
+        "CSA"
+      ],
+      "Palo Alto": [
+        "PAN-OS",
+        "GlobalProtect",
+        "Cortex XDR",
+        "Prisma Access"
+      ],
+      "Cisco": [
+        "ASA",
+        "IOS",
+        "ISE",
+        "Firepower",
+        "Cisco AnyConnect"
+      ],
+      "Hillstone": [
+        "Hillstone 防火墙",
+        "山石网科"
+      ],
+      "网康": [
+        "网康 NGFW"
+      ],
+      "Check Point": [
+        "Quantum",
+        "CloudGuard"
+      ],
+      "Juniper": [
+        "Junos OS",
+        "SRX",
+        "Junos Space"
+      ],
+      "Splunk": [
+        "Splunk Enterprise",
+        "Splunk Cloud",
+        "Splunk UF"
+      ]
+    },
+    "系统&云平台漏洞": {
+      "Docker": [
+        "Docker",
+        "runc",
+        "containerd",
+        "buildkit",
+        "Docker Compose"
+      ],
+      "Kubernetes": [
+        "K8s",
+        "Kubernetes",
+        "Argo CD",
+        "Istio",
+        "Helm",
+        "K3S"
+      ],
+      "VMware": [
+        "vCenter",
+        "ESXi",
+        "Workspace ONE",
+        "Horizon",
+        "Cloud Foundation",
+        "NSX"
+      ],
+      "Microsoft": [
+        "Windows",
+        "Windows Server",
+        "Azure"
+      ],
+      "Apache": [
+        "CloudStack"
+      ],
+      "OpenStack": [
+        "OpenStack",
+        "Nova",
+        "Keystone"
+      ],
+      "阿里云": [
+        "ACK",
+        "ROS",
+        "OSS",
+        "RAM"
+      ],
+      "腾讯云": [
+        "TKE",
+        "CVM",
+        "COS"
+      ],
+      "Proxmox": [
+        "Proxmox VE"
+      ],
+      "Kernel": [
+        "Linux Kernel",
+        "Linux内核"
+      ],
+      "云存储": [
+        "对象存储",
+        "OSS",
+        "S3",
+        "COS",
+        "AccessKey",
+        "SecretKey",
+        "存储桶"
+      ],
+      "Apple": [
+        "iOS",
+        "macOS",
+        "tvOS",
+        "watchOS",
+        "visionOS"
+      ]
+    }
+  },
+  "alias_map": {
+    "Apache Shiro": [
+      "Apache",
+      "Shiro"
+    ],
+    "Shiro": [
+      "Apache",
+      "Shiro"
+    ],
+    "Apache Struts": [
+      "Apache",
+      "Struts2"
+    ],
+    "Struts2": [
+      "Apache",
+      "Struts2"
+    ],
+    "Struts": [
+      "Apache",
+      "Struts2"
+    ],
+    "Apache ActiveMQ": [
+      "Apache",
+      "ActiveMQ"
+    ],
+    "ActiveMQ": [
+      "Apache",
+      "ActiveMQ"
+    ],
+    "Apache Tomcat": [
+      "Apache",
+      "Tomcat"
+    ],
+    "Tomcat": [
+      "Apache",
+      "Tomcat"
+    ],
+    "Apache HTTP Server": [
+      "Apache",
+      "HTTP Server"
+    ],
+    "httpd": [
+      "Apache",
+      "HTTP Server"
+    ],
+    "Apache Log4j": [
+      "Apache",
+      "Log4j"
+    ],
+    "Log4j": [
+      "Apache",
+      "Log4j"
+    ],
+    "Log4Shell": [
+      "Apache",
+      "Log4j"
+    ],
+    "Apache OFBiz": [
+      "Apache",
+      "OFBiz"
+    ],
+    "OFBiz": [
+      "Apache",
+      "OFBiz"
+    ],
+    "Apache Kafka": [
+      "Apache",
+      "Kafka"
+    ],
+    "Spring Cloud Gateway": [
+      "Spring",
+      "Spring Cloud Gateway"
+    ],
+    "Spring Boot": [
+      "Spring",
+      "Spring Boot"
+    ],
+    "Spring Framework": [
+      "Spring",
+      "Spring Framework"
+    ],
+    "Spring WS": [
+      "Spring",
+      "Spring WS"
+    ],
+    "WebLogic": [
+      "Oracle",
+      "WebLogic"
+    ],
+    "Oracle WebLogic": [
+      "Oracle",
+      "WebLogic"
+    ],
+    "MySQL": [
+      "Oracle",
+      "MySQL"
+    ],
+    "MS SQL Server": [
+      "Microsoft",
+      "SQL Server"
+    ],
+    "SQL Server": [
+      "Microsoft",
+      "SQL Server"
+    ],
+    "K8s": [
+      "Kubernetes",
+      "K8s"
+    ],
+    "Kubernetes": [
+      "Kubernetes",
+      "K8s"
+    ],
+    "K3S": [
+      "Kubernetes",
+      "K3S"
+    ],
+    "K3s": [
+      "Kubernetes",
+      "K3S"
+    ],
+    "F5 BIG-IP": [
+      "F5",
+      "BIG-IP"
+    ],
+    "BIG-IP": [
+      "F5",
+      "BIG-IP"
+    ],
+    "FortiGate": [
+      "Fortinet",
+      "FortiGate"
+    ],
+    "Fortinet FortiGate": [
+      "Fortinet",
+      "FortiGate"
+    ],
+    "通达OA": [
+      "通达",
+      "通达OA"
+    ],
+    "TongdaOA": [
+      "通达",
+      "通达OA"
+    ],
+    "泛微 e-cology": [
+      "泛微",
+      "e-cology"
+    ],
+    "e-cology": [
+      "泛微",
+      "e-cology"
+    ],
+    "Splunk Enterprise": [
+      "Splunk",
+      "Splunk Enterprise"
+    ],
+    "Splunk": [
+      "Splunk",
+      "Splunk Enterprise"
+    ],
+    "Fastjson": [
+      "Alibaba",
+      "Fastjson"
+    ],
+    "Nacos": [
+      "Alibaba",
+      "Nacos"
+    ],
+    "XXL-JOB": [
+      "Alibaba",
+      "XXL-JOB"
+    ],
+    "Pulse Connect Secure": [
+      "Ivanti",
+      "Connect Secure"
+    ],
+    "NGINX": [
+      "Nginx",
+      "Nginx"
+    ],
+    "nginx": [
+      "Nginx",
+      "Nginx"
+    ],
+    "Next.js": [
+      "React",
+      "Next.js"
+    ],
+    "React Server Components": [
+      "React",
+      "React Server Components"
+    ],
+    "Grafana": [
+      "Grafana",
+      "Grafana"
+    ],
+    "Prometheus": [
+      "Prometheus",
+      "Prometheus"
+    ],
+    "Windows": [
+      "Microsoft",
+      "Windows"
+    ],
+    "Windows Server": [
+      "Microsoft",
+      "Windows Server"
+    ],
+    "ELK": [
+      "Elasticsearch",
+      "Elasticsearch"
+    ],
+    "Kibana": [
+      "Elasticsearch",
+      "Kibana"
+    ],
+    "OSS": [
+      "云存储",
+      "对象存储"
+    ],
+    "S3": [
+      "云存储",
+      "对象存储"
+    ],
+    "COS": [
+      "云存储",
+      "对象存储"
+    ],
+    "AccessKey泄露": [
+      "云存储",
+      "对象存储"
+    ],
+    "SecretKey泄露": [
+      "云存储",
+      "对象存储"
+    ],
+    "jeecg-boot": [
+      "JeecgBoot",
+      "JeecgBoot"
+    ],
+    "jeecgboot": [
+      "JeecgBoot",
+      "JeecgBoot"
+    ],
+    "Jeecg": [
+      "JeecgBoot",
+      "JeecgBoot"
+    ],
+    "Apple iOS": [
+      "Apple",
+      "iOS"
+    ],
+    "macOS": [
+      "Apple",
+      "macOS"
+    ],
+    "Vite": [
+      "Vite",
+      "Vite"
+    ],
+    "libssh2": [
+      "libssh2",
+      "libssh2"
+    ]
+  },
+  "non_24_routes": {
+    "linux kernel": "1.4",
+    "linux 内核": "1.4",
+    "内核漏洞": "1.4",
+    "LPE": "1.4",
+    "本地提权": "1.4",
+    "网络设备": "2.3",
+    "安全设备": "2.3",
+    "交换机": "2.3"
+  }
+}

@@ -1,0 +1,14 @@
+# 用户配置（含敏感凭证）
+feishu_config.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# 素材
+assets/*
+
+# IDE
+.vscode/
+.idea/

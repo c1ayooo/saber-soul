@@ -63,11 +63,11 @@ for i in range(0, len(blocks), 20):
 
 **处理方式：** 文档内容中避免使用含这些子串的词；或使用 `negative_keywords` 排除。
 
-## 6. 搜索 API 不可用（/search/v2/search 返回 404）
+## 6. 搜索 API 不可用（/search/v2/search 返回 404/非 JSON）
 
-飞书 `/search/v2/search` 端点需要 `search:search` scope 或特定应用权限，多数应用不可用。
+飞书 `/search/v2/search` 端点需要 `search:search` scope 或特定应用权限，多数应用不可用。GET 请求返回 404（非 JSON），导致 `resp.json()` 抛出 `JSONDecodeError: Extra data`。
 
-**处理方式（已修复）：** `FeishuDoc.search()` 改用 wiki 节点遍历 + 标题模糊匹配：
+**修复方法（已合并到 feishu_doc.py）：** `FeishuDoc.search()` 改用 wiki 节点遍历 + 标题模糊匹配：
 
 ```python
 def search(self, keyword):

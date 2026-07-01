@@ -43,6 +43,17 @@
     },
     {
       "keywords": [
+        "运维部署工具",
+        "漏洞清单",
+        "CVEs"
+      ],
+      "negative_keywords": [],
+      "folder": "2.4",
+      "type": "CVE情报",
+      "weight": 5
+    },
+    {
+      "keywords": [
         "信息收集",
         "暴露面",
         "端口扫描",
